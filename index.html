@@ -228,11 +228,11 @@ const customsDutyPrice = isNaN(customsDutyRate) ? 0 : costPriceInJPY * customsDu
 
 
             const commission = sellingPrice * (commissionRate / 100);
-            const profit = (isNaN(sellingPrice) ? 0 : sellingPrice) - 
-               (isNaN(commission) ? 0 : commission) - 
-               (isNaN(shippingCost) ? 0 : shippingCost) - 
-               (isNaN(costPriceInJPY) ? 0 : costPriceInJPY) - 
-               (isNaN(purchaseShippingCostInJPY) ? 0 : purchaseShippingCostInJPY) - 
+            const profit = (isNaN(sellingPrice) ? 0 : sellingPrice) -
+               (isNaN(commission) ? 0 : commission) -
+               (isNaN(shippingCost) ? 0 : shippingCost) -
+               (isNaN(costPriceInJPY) ? 0 : costPriceInJPY) -
+               (isNaN(purchaseShippingCostInJPY) ? 0 : purchaseShippingCostInJPY) -
                (isNaN(customsDutyPrice) ? 0 : customsDutyPrice);
 
 const profitRate = sellingPrice > 0 ? (profit / sellingPrice) * 100 : 0;
@@ -243,11 +243,11 @@ const profitRate = sellingPrice > 0 ? (profit / sellingPrice) * 100 : 0;
             document.getElementById('displayCustomsDuty').textContent = isNaN(customsDutyPrice) ? "0" : customsDutyPrice.toFixed(0);
 
             document.getElementById('displayCommission').textContent = commission.toFixed(0);
-            document.getElementById('displayCostPriceJPY').textContent = costPriceCurrency === "JPY" 
-    ? costPrice.toFixed(0) 
+            document.getElementById('displayCostPriceJPY').textContent = costPriceCurrency === "JPY"
+    ? costPrice.toFixed(0)
     : (costPrice * exchangeRate).toFixed(0);
-document.getElementById('displayCostPriceKRW').textContent = costPriceCurrency === "KRW" 
-    ? costPrice.toFixed(0) 
+document.getElementById('displayCostPriceKRW').textContent = costPriceCurrency === "KRW"
+    ? costPrice.toFixed(0)
     : (costPrice / exchangeRate).toFixed(0);
 
             document.getElementById('displayPurchaseShippingCost').textContent = purchaseShippingCostInJPY.toFixed(0);
@@ -255,14 +255,14 @@ document.getElementById('displayCostPriceKRW').textContent = costPriceCurrency =
             document.getElementById('displayProfitRate').textContent = profitRate.toFixed(2);
 
             // 結果をresultTextに表示
-            const resultText = メルカリ販売価格：${sellingPrice.toFixed(0)}円
+            const resultText = `メルカリ販売価格：${sellingPrice.toFixed(0)}円
 メルカリ手数料：${commission.toFixed(0)}円
 メルカリ送料：${shippingCost.toFixed(0)}円
 仕入れ値：${costPriceInJPY.toFixed(0)}円
 仕入れ時送料：${purchaseShippingCostInJPY.toFixed(0)}円
 関税：${customsDutyPrice.toFixed(0)}円
 ＝利益額：${profit.toFixed(0)}円
-;
+`;
             document.getElementById('resultText').textContent = resultText;
         }
     </script>
