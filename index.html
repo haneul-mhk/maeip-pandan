@@ -5,6 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>仕入れ判断</title>
     <style>
+                    #resultText {
+                    margin-top: 10px;  /* ボタンとの間隔 */
+                    padding: 10px;
+                    background-color: #fffaf0;
+                    border: 1px solid #ffc0cb;
+                    border-radius: 4px;
+                    color: #db7093;
+                    font-family: monospace;
+                    white-space: pre-wrap;
+                    text-align: left;
+                }
+
             .input-table {
                               width: 100%;
                               display: grid;
@@ -12,13 +24,14 @@
                               gap: 10px;
                           }
 
-                          .input-table td {
-                              display: flex;
-                              flex-direction: column;
-                              justify-content: center;
-                          }
+                          .input-table div {
+                                display: flex;
+                                flex-direction: column;
+                                justify-content: center;
+                            }
 
-    　　@media (max-width: 768px) {
+
+    　　 @media (max-width: 768px) {
           /* スマホ用のレイアウト調整 */
           .container {
             flex-direction: column; /* 縦並びにする */
@@ -88,16 +101,7 @@
             font-weight: bold;
             color: #b22222;
         }
-        .result-text {
-            margin-top: 20px;
-            padding: 10px;
-            background-color: #fffaf0;
-            border: 1px solid #ffc0cb;
-            border-radius: 4px;
-            color: #db7093;
-            font-family: monospace;
-            white-space: pre-wrap;
-        }
+        
     </style>
 </head>
 <body>
@@ -160,13 +164,16 @@
                 <input type="radio" id="customsDutyFalse" name="customsDuty" value="False">
                 <label for="customsDutyFalse">なし</label>
                 <input type="number" id="customsRate" placeholder="15" required>
-
             </div>
 
-            <div class="buttons">
-                <button type="button" onclick="calculateProfit()">計算する</button>
-                <button type="reset">リセット</button>
-            </div>
+           <div class="buttons">
+                  <button type="button" onclick="calculateProfit()">計算する</button>
+                  <button type="reset">リセット</button>
+              </div>
+              <!-- ここに resultText を追加 -->
+              <div id="resultText">ここに計算結果が表示されます（「仕入れ判断テンプレート②」にコピペ可能）</div>
+
+
         </form>
 
         <table>
@@ -185,10 +192,7 @@
             <td>利益 (円)</td><td id="displayProfit" class="highlight">-</td>
             <td>利益率 (%)</td><td id="displayProfitRate">-</td></tr>
         </table>
-
-
-
-        <div id="resultText" class="result-text"></div>
+       
     </div>
 
     <script>
@@ -269,15 +273,14 @@
             document.getElementById('displayProfitRate').textContent = profitRate.toFixed(2);
 
             // 結果をresultTextに表示
-            const resultText = `メルカリ販売価格：${sellingPrice.toFixed(0)}円
-            メルカリ手数料：${commission.toFixed(0)}円
-            メルカリ送料：${shippingCost.toFixed(0)}円
-            仕入れ値：${costPriceInJPY.toFixed(0)}円
-            仕入れ時送料：${purchaseShippingCostInJPY.toFixed(0)}円
-            関税：${customsDutyPrice.toFixed(0)}円
-            ＝利益額：${profit.toFixed(0)}円
-            `;
-            document.getElementById('resultText').textContent = resultText;
+           const resultText = `メルカリ販売価格：${sellingPrice.toFixed(0)}円\n
+メルカリ手数料：${commission.toFixed(0)}円\n
+メルカリ送料：${shippingCost.toFixed(0)}円\n
+仕入れ値：${costPriceInJPY.toFixed(0)}円\n
+仕入れ時送料：${purchaseShippingCostInJPY.toFixed(0)}円\n
+関税：${customsDutyPrice.toFixed(0)}円\n
+＝利益額：${profit.toFixed(0)}円`;
+document.getElementById('resultText').textContent = resultText;
         }
     </script>
 </body>
