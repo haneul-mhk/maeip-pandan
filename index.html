@@ -1,11 +1,27 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+          　
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>仕入れ判断</title>
     <style>
-                    #resultText {
+       /* 販売プラットフォームの選択スタイル */
+    select#platform {
+    width: 100%;
+    padding: 8px;
+    margin-top: 10px;
+    border: 1px solid #ffc0cb;
+    border-radius: 4px;
+    background-color: #fffaf0;
+    color: #db7093;
+}
+
+
+
+                     /* 計算結果の表示エリア */
+                     #resultText {
                     margin-top: 10px;  /* ボタンとの間隔 */
                     padding: 10px;
                     background-color: #fffaf0;
@@ -109,14 +125,21 @@
         <h1>仕入れ判断</h1>
         <form id="profitCalculator">
             <label for="sellingPrice">販売価格（円）:</label>
-            <input type="number" id="sellingPrice" placeholder="0" required>
+        <input type="number" id="sellingPrice" placeholder="0" required>
+        <br><br>
 
-            <br><br>
+        <!-- 手数料率のフィールドを削除し、販売プラットフォームの選択のみ残す -->
+        <label for="platform">販売プラットフォーム:</label>
+        <select id="platform">
+            <option value="mercari">メルカリ</option>
+            <option value="rakuma">ラクマ</option>
+            <option value="yahoo">ヤフオク</option>
+            <option value="paypay">PayPayフリマ</option>
+            <option value="SNKRDUNK">スニダン</option>
+            <option value="BUYMA">バイマ</option>
+        </select>
+        <br><br>
 
-            <label for="commissionRate">メルカリ手数料率（%）※販路によって手入力可:</label>
-            <input type="number" id="commissionRate" value="10" placeholder="10" required>
-
-            <br><br>
 
             <label for="shippingCost">メルカリ送料（円）:</label>
             <select id="shippingCost" required>
@@ -129,7 +152,7 @@
             </select>
 
             <input type="number" id="shippingCostHand" placeholder="0" style="display: none;" required>
-
+            
             <br><br>
 
             <label>仕入れ値:</label>
@@ -166,12 +189,15 @@
                 <input type="number" id="customsRate" placeholder="15" required>
             </div>
 
-           <div class="buttons">
-                  <button type="button" onclick="calculateProfit()">計算する</button>
-                  <button type="reset">リセット</button>
-              </div>
-              <!-- ここに resultText を追加 -->
-              <div id="resultText">ここに計算結果が表示されます（「仕入れ判断テンプレート②」にコピペ可能）</div>
+          <div class="buttons">
+    <button type="button" onclick="calculateProfit()">計算する</button>
+    <button type="reset">リセット</button>
+</div>
+
+<!-- ここに計算結果が表示されます -->
+<textarea id="resultText" readonly rows="7"></textarea>
+<button onclick="copyToClipboard()">コピー</button>
+
 
 
         </form>
@@ -217,71 +243,140 @@
         });
 
 
-        async function calculateProfit() {
-            const exchangeRate = parseFloat(document.getElementById('exchangeRate').value) || 0.1;
+  async function calculateProfit() {
+    const exchangeRate = parseFloat(document.getElementById('exchangeRate').value) || 0;
+    const sellingPrice = parseFloat(document.getElementById('sellingPrice').value) || 0;
+    const selectedPlatform = document.getElementById('platform').value;
+    const commissionRate = (platformFees[selectedPlatform] || 0) / 100;
+    const commission = sellingPrice * commissionRate;
 
-            const sellingPrice = parseFloat(document.getElementById('sellingPrice').value) || 0;
-            const commissionRate = parseFloat(document.getElementById('commissionRate').value) || 0;
+    let shippingCost = parseFloat(document.getElementById('shippingCost').value) || 0;
+    const shippingCostHand = parseFloat(document.getElementById('shippingCostHand').value) || 0;
 
-            let shippingCost = parseFloat(document.getElementById('shippingCost').value) || 0;
-            const shippingCostHand = parseFloat(document.getElementById('shippingCostHand').value) || 0;
+    if (document.getElementById('shippingCost').value === "None") {
+        shippingCost = shippingCostHand;
+    }
 
-            // "手入力する" が選択されている場合、shippingCost を shippingCostHand の値に変更
-            if (document.getElementById('shippingCost').value === "None") {
-                shippingCost = shippingCostHand;
-            }
+    const costPrice = parseFloat(document.getElementById('costPrice').value) || 0;
+    const purchaseShippingCost = parseFloat(document.getElementById('purchaseShippingCost').value) || 0;
+    const costPriceCurrency = document.querySelector('input[name="costPriceCurrency"]:checked').value;
+    const costPriceInJPY = costPriceCurrency === "JPY" ? costPrice : Math.round(costPrice * exchangeRate);
+    const purchaseShippingCostCurrency = document.querySelector('input[name="shippingCostCurrency"]:checked').value;
+    const purchaseShippingCostInJPY = purchaseShippingCostCurrency === "JPY" ? purchaseShippingCost : Math.round(purchaseShippingCost * exchangeRate);
 
-            const costPrice = parseFloat(document.getElementById('costPrice').value) || 0;
-            const purchaseShippingCost = parseFloat(document.getElementById('purchaseShippingCost').value) || 0;
+    const customsDutyRate = document.getElementById('customsDutyTrue').checked ? parseFloat(document.getElementById('customsRate').value) / 100 : 0;
+    const customsDutyPrice = isNaN(customsDutyRate) ? 0 : costPriceInJPY * customsDutyRate;
 
-            // 通貨選択
-            const costPriceCurrency = document.querySelector('input[name="costPriceCurrency"]:checked').value;
-            const costPriceInJPY = costPriceCurrency === "JPY"
-            ? costPrice
-            : Math.round(costPrice * exchangeRate);  // 整数に丸める
-            const purchaseShippingCostCurrency = document.querySelector('input[name="shippingCostCurrency"]:checked').value;
-            const purchaseShippingCostInJPY = purchaseShippingCostCurrency === "JPY"
-            ? purchaseShippingCost
-            : Math.round(purchaseShippingCost * exchangeRate);  // 整数に丸める
-            // 関税有無の選択
-           const customsDutyRate = document.getElementById('customsDutyTrue').checked
-            ? parseFloat(document.getElementById('customsRate').value) / 100
-            : 0; // 関税なしを選択したら0にする
+    const profit = (sellingPrice - commission - shippingCost - costPriceInJPY - purchaseShippingCostInJPY - customsDutyPrice);
+    const profitRate = sellingPrice > 0 ? (profit / sellingPrice) * 100 : 0;
 
-            const customsDutyPrice = isNaN(customsDutyRate) ? 0 : costPriceInJPY * customsDutyRate;
-            const commission = sellingPrice * (commissionRate / 100);
-            const profit = (isNaN(sellingPrice) ? 0 : sellingPrice) -
-               (isNaN(commission) ? 0 : commission) -
-               (isNaN(shippingCost) ? 0 : shippingCost) -
-               (isNaN(costPriceInJPY) ? 0 : costPriceInJPY) -
-               (isNaN(purchaseShippingCostInJPY) ? 0 : purchaseShippingCostInJPY) -
-               (isNaN(customsDutyPrice) ? 0 : customsDutyPrice);
-            const profitRate = sellingPrice > 0 ? (profit / sellingPrice) * 100 : 0;
-            document.getElementById('displaySellingPrice').textContent = sellingPrice.toFixed(0);
-            document.getElementById('displayShippingCost').textContent = shippingCost.toFixed(0);
-            document.getElementById('displayCustomsDuty').textContent = isNaN(customsDutyPrice) ? "0" : customsDutyPrice.toFixed(0);  
-            document.getElementById('displayCommission').textContent = commission.toFixed(0);
-            document.getElementById('displayCostPriceJPY').textContent = costPriceCurrency === "JPY"
-            ? costPrice.toFixed(0)
-            : (costPrice * exchangeRate).toFixed(0);
-                    document.getElementById('displayCostPriceKRW').textContent = costPriceCurrency === "KRW"
-            ? costPrice.toFixed(0)
-            : (costPrice / exchangeRate).toFixed(0);    
+    document.getElementById('displaySellingPrice').textContent = sellingPrice.toFixed(0);
+    document.getElementById('displayCommission').textContent = commission.toFixed(0);
+    document.getElementById('displayShippingCost').textContent = shippingCost.toFixed(0);
+    document.getElementById('displayCustomsDuty').textContent = isNaN(customsDutyPrice) ? "0" : customsDutyPrice.toFixed(0);
+    document.getElementById('displayCostPriceJPY').textContent = costPriceCurrency === "JPY" ? costPrice.toFixed(0) : (costPrice * exchangeRate).toFixed(0);
+    document.getElementById('displayCostPriceKRW').textContent = costPriceCurrency === "KRW" ? costPrice.toFixed(0) : (costPrice / exchangeRate).toFixed(0);
+    document.getElementById('displayPurchaseShippingCost').textContent = purchaseShippingCostInJPY.toFixed(0);
+    document.getElementById('displayProfit').textContent = profit.toFixed(0);
+    document.getElementById('displayProfitRate').textContent = profitRate.toFixed(2);
 
-            document.getElementById('displayPurchaseShippingCost').textContent = purchaseShippingCostInJPY.toFixed(0);
-            document.getElementById('displayProfit').textContent = profit.toFixed(0);
-            document.getElementById('displayProfitRate').textContent = profitRate.toFixed(2);
-
-            // 結果をresultTextに表示
-           const resultText = `メルカリ販売価格：${sellingPrice.toFixed(0)}円\n
-メルカリ手数料：${commission.toFixed(0)}円\n
-メルカリ送料：${shippingCost.toFixed(0)}円\n
-仕入れ値：${costPriceInJPY.toFixed(0)}円\n
-仕入れ時送料：${purchaseShippingCostInJPY.toFixed(0)}円\n
-関税：${customsDutyPrice.toFixed(0)}円\n
+    // 改行を保持して計算結果を表示
+    const resultText = 
+`販売価格：${sellingPrice.toFixed(0)}円
+販売手数料：${commission.toFixed(0)}円
+送料：${shippingCost.toFixed(0)}円
+仕入れ値：${costPriceInJPY.toFixed(0)}円
+仕入れ時送料：${purchaseShippingCostInJPY.toFixed(0)}円
+関税：${customsDutyPrice.toFixed(0)}円
 ＝利益額：${profit.toFixed(0)}円`;
-document.getElementById('resultText').textContent = resultText;
-        }
+
+    document.getElementById('resultText').value = resultText;
+}
+
+// クリップボードにコピーする関数
+function copyToClipboard() {
+    const resultText = document.getElementById('resultText');
+    resultText.select();
+    resultText.setSelectionRange(0, 99999); // モバイル対応
+
+    navigator.clipboard.writeText(resultText.value).then(() => {
+        alert("計算結果をコピーしました！");
+    }).catch(err => {
+        console.error("コピーに失敗しました", err);
+    });
+}
+
+
+
+// プラットフォームごとの手数料率（%）
+const platformFees = {
+    mercari: 10,      // メルカリ: 10%
+    rakuma: 6,        // ラクマ: 6%
+    yahoo: 8.5,       // ヤフオク: 8.5%
+    paypay: 5,        // PayPayフリマ: 5%
+    SNKRDUNK: 5.5,    // スニダン: 5.5%
+    BUYMA: 7.9        // バイマ: 7.9%
+};
+
+// プラットフォームごとの送料リスト
+const platformShipping = {
+    mercari: [
+        { value: 160, text: "📮¥160 ゆうパケットポストmini（要専用封筒）" },
+        { value: 215, text: "📮¥215 ゆうパケットポスト（要専用シール/要専用箱）" },
+        { value: 455, text: "🏣¥455 ゆうパケットプラス（要専用箱）" },
+        { value: 210, text: "🐈‍⬛¥210 ネコポス（ポスト受取サイズ）" },
+        { value: 450, text: "🐈‍⬛¥450 宅急便コンパクト" },
+        { value: "None", text: "手入力する" }
+    ],
+    rakuma: [
+        { value: 179, text: "📮¥179 かんたんラクマパック（ネコポス）" },
+        { value: 380, text: "🐈‍⬛¥380 かんたんラクマパック（宅急便コンパクト）" },
+        { value: "None", text: "手入力する" }
+    ],
+    yahoo: [
+        { value: 210, text: "📦¥210 ヤフネコ! ネコポス" },
+        { value: 380, text: "📦¥380 ヤフネコ! 宅急便コンパクト" },
+        { value: "None", text: "手入力する" }
+    ],
+    paypay: [
+        { value: 170, text: "📦¥170 ゆうパケット（ポスト投函）" },
+        { value: 380, text: "📦¥380 宅急便コンパクト" },
+        { value: "None", text: "手入力する" }
+    ],
+    SNKRDUNK: [
+        { value: 800, text: "📦¥800 通常配送" },
+        { value: "None", text: "手入力する" }
+    ],
+    BUYMA: [
+        { value: 1000, text: "📦¥1000 国際配送" },
+        { value: "None", text: "手入力する" }
+    ]
+};
+
+// プラットフォームが変更されたときの処理
+document.getElementById("platform").addEventListener("change", function () {
+    const selectedPlatform = this.value;
+    updateShippingOptions(selectedPlatform);
+});
+
+
+
+// 送料選択肢を更新する関数
+function updateShippingOptions(platform) {
+    const shippingSelect = document.getElementById("shippingCost");
+    shippingSelect.innerHTML = ""; // 一旦クリア
+
+    if (platformShipping[platform]) {
+        platformShipping[platform].forEach(option => {
+            const opt = document.createElement("option");
+            opt.value = option.value;
+            opt.textContent = option.text;
+            shippingSelect.appendChild(opt);
+        });
+    }
+}
+
     </script>
 </body>
 </html>
+
