@@ -5,6 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>仕入れ判断</title>
     <style>
+            .input-table {
+                              width: 100%;
+                              display: grid;
+                              grid-template-columns: 1fr 1fr; /* 2列 */
+                              gap: 10px;
+                          }
+
+                          .input-table td {
+                              display: flex;
+                              flex-direction: column;
+                              justify-content: center;
+                          }
+
+    　　@media (max-width: 768px) {
+          /* スマホ用のレイアウト調整 */
+          .container {
+            flex-direction: column; /* 縦並びにする */
+          }
+          .input-field {
+            width: 100%; /* フル幅にする */
+          }
+        }
+
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
@@ -127,9 +150,9 @@
                  <br><br>
             </div>
             <label>為替レート（1ウォンあたりの円換算）:</label>
-<input type="number" id="exchangeRate" placeholder="0.1" required>
+            <input type="number" id="exchangeRate" placeholder="0.1" required>
 
-<br><br>
+            <br><br>
             <label>関税率（%）:</label>
             <div>
                 <input type="radio" id="customsDutyTrue" name="customsDuty" value="True" checked>
@@ -147,17 +170,23 @@
         </form>
 
         <table>
-            <tr><th>項目</th><th>値</th></tr>
-            <tr><td>メルカリ販売価格</td><td id="displaySellingPrice">-</td></tr>
-            <tr><td>メルカリ手数料</td><td id="displayCommission">-</td></tr>
-            <tr><td>メルカリ送料</td><td id="displayShippingCost">-</td></tr>
-            <tr><td>仕入れ値 (円)</td><td id="displayCostPriceJPY">-</td></tr>
-            <tr><td>仕入れ値 (ウォン)</td><td id="displayCostPriceKRW">-</td></tr>
-            <tr><td>仕入れ時送料</td><td id="displayPurchaseShippingCost">-</td></tr>
-            <tr><td>関税</td><td id="displayCustomsDuty">-</td></tr>
-            <tr><td>利益 (円)</td><td id="displayProfit" class="highlight">-</td></tr>
-            <tr><td>利益率 (%)</td><td id="displayProfitRate">-</td></tr>
+            <tr>
+            <th>項目</th><th>値</th>
+            <th>項目</th><th>値</th>
+            <th>項目</th><th>値</th>
+            </tr>
+            <tr><td>メルカリ販売価格</td><td id="displaySellingPrice">-</td>
+            <td>メルカリ手数料</td><td id="displayCommission">-</td>
+            <td>メルカリ送料</td><td id="displayShippingCost">-</td></tr>
+            <tr><td>仕入れ値 (円)</td><td id="displayCostPriceJPY">-</td>
+            <td>仕入れ値 (ウォン)</td><td id="displayCostPriceKRW">-</td>
+            <td>仕入れ時送料</td><td id="displayPurchaseShippingCost">-</td></tr>
+            <tr><td>関税</td><td id="displayCustomsDuty">-</td>
+            <td>利益 (円)</td><td id="displayProfit" class="highlight">-</td>
+            <td>利益率 (%)</td><td id="displayProfitRate">-</td></tr>
         </table>
+
+
 
         <div id="resultText" class="result-text"></div>
     </div>
@@ -204,29 +233,18 @@
             // 通貨選択
             const costPriceCurrency = document.querySelector('input[name="costPriceCurrency"]:checked').value;
             const costPriceInJPY = costPriceCurrency === "JPY"
-    ? costPrice
-    : Math.round(costPrice * exchangeRate);  // 整数に丸める
-
-
-
+            ? costPrice
+            : Math.round(costPrice * exchangeRate);  // 整数に丸める
             const purchaseShippingCostCurrency = document.querySelector('input[name="shippingCostCurrency"]:checked').value;
-const purchaseShippingCostInJPY = purchaseShippingCostCurrency === "JPY"
-    ? purchaseShippingCost
-    : Math.round(purchaseShippingCost * exchangeRate);  // 整数に丸める
-
-
-
+            const purchaseShippingCostInJPY = purchaseShippingCostCurrency === "JPY"
+            ? purchaseShippingCost
+            : Math.round(purchaseShippingCost * exchangeRate);  // 整数に丸める
             // 関税有無の選択
            const customsDutyRate = document.getElementById('customsDutyTrue').checked
-    ? parseFloat(document.getElementById('customsRate').value) / 100
-    : 0; // 関税なしを選択したら0にする
+            ? parseFloat(document.getElementById('customsRate').value) / 100
+            : 0; // 関税なしを選択したら0にする
 
-const customsDutyPrice = isNaN(customsDutyRate) ? 0 : costPriceInJPY * customsDutyRate;
-
-
-
-
-
+            const customsDutyPrice = isNaN(customsDutyRate) ? 0 : costPriceInJPY * customsDutyRate;
             const commission = sellingPrice * (commissionRate / 100);
             const profit = (isNaN(sellingPrice) ? 0 : sellingPrice) -
                (isNaN(commission) ? 0 : commission) -
@@ -234,21 +252,17 @@ const customsDutyPrice = isNaN(customsDutyRate) ? 0 : costPriceInJPY * customsDu
                (isNaN(costPriceInJPY) ? 0 : costPriceInJPY) -
                (isNaN(purchaseShippingCostInJPY) ? 0 : purchaseShippingCostInJPY) -
                (isNaN(customsDutyPrice) ? 0 : customsDutyPrice);
-
-const profitRate = sellingPrice > 0 ? (profit / sellingPrice) * 100 : 0;
-
-
+            const profitRate = sellingPrice > 0 ? (profit / sellingPrice) * 100 : 0;
             document.getElementById('displaySellingPrice').textContent = sellingPrice.toFixed(0);
             document.getElementById('displayShippingCost').textContent = shippingCost.toFixed(0);
-            document.getElementById('displayCustomsDuty').textContent = isNaN(customsDutyPrice) ? "0" : customsDutyPrice.toFixed(0);
-
+            document.getElementById('displayCustomsDuty').textContent = isNaN(customsDutyPrice) ? "0" : customsDutyPrice.toFixed(0);  
             document.getElementById('displayCommission').textContent = commission.toFixed(0);
             document.getElementById('displayCostPriceJPY').textContent = costPriceCurrency === "JPY"
-    ? costPrice.toFixed(0)
-    : (costPrice * exchangeRate).toFixed(0);
-document.getElementById('displayCostPriceKRW').textContent = costPriceCurrency === "KRW"
-    ? costPrice.toFixed(0)
-    : (costPrice / exchangeRate).toFixed(0);
+            ? costPrice.toFixed(0)
+            : (costPrice * exchangeRate).toFixed(0);
+                    document.getElementById('displayCostPriceKRW').textContent = costPriceCurrency === "KRW"
+            ? costPrice.toFixed(0)
+            : (costPrice / exchangeRate).toFixed(0);    
 
             document.getElementById('displayPurchaseShippingCost').textContent = purchaseShippingCostInJPY.toFixed(0);
             document.getElementById('displayProfit').textContent = profit.toFixed(0);
@@ -256,13 +270,13 @@ document.getElementById('displayCostPriceKRW').textContent = costPriceCurrency =
 
             // 結果をresultTextに表示
             const resultText = `メルカリ販売価格：${sellingPrice.toFixed(0)}円
-メルカリ手数料：${commission.toFixed(0)}円
-メルカリ送料：${shippingCost.toFixed(0)}円
-仕入れ値：${costPriceInJPY.toFixed(0)}円
-仕入れ時送料：${purchaseShippingCostInJPY.toFixed(0)}円
-関税：${customsDutyPrice.toFixed(0)}円
-＝利益額：${profit.toFixed(0)}円
-`;
+            メルカリ手数料：${commission.toFixed(0)}円
+            メルカリ送料：${shippingCost.toFixed(0)}円
+            仕入れ値：${costPriceInJPY.toFixed(0)}円
+            仕入れ時送料：${purchaseShippingCostInJPY.toFixed(0)}円
+            関税：${customsDutyPrice.toFixed(0)}円
+            ＝利益額：${profit.toFixed(0)}円
+            `;
             document.getElementById('resultText').textContent = resultText;
         }
     </script>
