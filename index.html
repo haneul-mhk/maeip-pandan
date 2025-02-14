@@ -2,7 +2,6 @@
 <html lang="ja">
 <head>
 
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>계산기</title>
@@ -44,7 +43,6 @@
                                 justify-content: center;
                             }
 
-
     　@media (max-width: 768px) {
     table {
         display: block;
@@ -59,23 +57,39 @@
 }
 
 
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #ffe4e1;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #fff0f5;
-            border-radius: 8px;
-            border: 1px solid #ffc0cb;
-        }
-        h1 {
-    text-align: center;
-    color: #db7093;
-    font-size: 1.3em; /* ここを追加 */
+       body {
+    font-family: Arial, sans-serif;
+    margin: 10px; /* 余白を減らしてコンパクトに */
+    background-color: #ffe4e1;
+    font-size: 14px; /* 文字を少し小さくする */
+}
+
+.container {
+    max-width: 500px; /* 横幅を狭めて画面に収まりやすくする */
+    margin: 0 auto;
+    padding: 10px; /* 余白を減らしてコンパクトに */
+    background-color: #fff0f5;
+    border-radius: 8px;
+    border: 1px solid #ffc0cb;
+}
+
+/* 入力フィールドのサイズを小さく */
+input[type="number"], select {
+    width: 100%;
+    padding: 6px; /* 余白を減らす */
+    font-size: 14px; /* フォントサイズを小さく */
+}
+
+/* 2列レイアウトを導入して横に並べる */
+.input-table {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 2列レイアウト */
+    gap: 8px; /* 隙間を少し調整 */
+}
+
+.input-table div {
+    display: flex;
+    flex-direction: column;
 }
 
         table {
