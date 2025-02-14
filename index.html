@@ -1,26 +1,53 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>仕入れ判断 計算サイト</title>
 
-<style>
-/* 販売プラットフォームの選択スタイル */
-select#platform {
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>계산기</title>
+    <style>
+       /* 販売プラットフォームの選択スタイル */
+    select#platform {
     width: 100%;
     padding: 8px;
     margin-top: 10px;
+    border: 1px solid #ffc0cb;
+    border-radius: 4px;
+    background-color: #fffaf0;
+    color: #db7093;
 }
 
-/* スマホ用のレイアウト調整 */
-@media (max-width: 768px) {
-    .container {
-        flex-direction: column;
-    }
-    .input-field {
-        width: 100%;
-    }
+
+
+                     /* 計算結果の表示エリア */
+                     #resultText {
+                    margin-top: 10px;  /* ボタンとの間隔 */
+                    padding: 10px;
+                    background-color: #fffaf0;
+                    border: 1px solid #ffc0cb;
+                    border-radius: 4px;
+                    color: #db7093;
+                    font-family: monospace;
+                    white-space: pre-wrap;
+                    text-align: left;
+                }
+
+            .input-table {
+                              width: 100%;
+                              display: grid;
+                              grid-template-columns: 1fr 1fr; /* 2列 */
+                              gap: 10px;
+                          }
+
+                          .input-table div {
+                                display: flex;
+                                flex-direction: column;
+                                justify-content: center;
+                            }
+
+
+    　@media (max-width: 768px) {
     table {
         display: block;
         width: 100%;
@@ -29,79 +56,155 @@ select#platform {
     }
     th, td {
         display: inline-block;
-        width: 45%;
+        width: 45%; /* 2列のレイアウトを維持 */
     }
 }
 
-body {
-    font-family: Arial, sans-serif;
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #ffe4e1;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff0f5;
+            border-radius: 8px;
+            border: 1px solid #ffc0cb;
+        }
+        h1 {
     text-align: center;
+    color: #db7093;
+    font-size: 1.3em; /* ここを追加 */
 }
 
-th, td {
-    padding: 8px;
-    text-align: left;
-    background-color: #fffaf0;
-    color: #db7093;
-    font-size: 12px;
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ffc0cb;
+        }
+        th, td {
+    font-size: 12px; /* 文字を小さくする */
+    padding: 4px; /* 余白も少し調整 */
     line-height: 1.2;
 }
 
-.buttons {
-    text-align: center;
-    margin-top: 20px;
-}
+        .buttons {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .buttons button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            background-color: #db7093;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .buttons button:hover {
+            background-color: #ff69b4;
+        }
+        input[type="number"], select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 10px;
+            border: 1px solid #ffc0cb;
+            border-radius: 4px;
+            background-color: #fffaf0;
+            color: #db7093;
+        }
+        .highlight {
+            font-weight: bold;
+            color: #b22222;
+        }
 
-.container {
-    max-width: 800px;
-    margin: auto;
-    padding: 20px;
-}
-</style>
+    </style>
 </head>
 <body>
+    <div class="container">
+        <h1>仕入れ判断 計算サイト</h1>
+        <form id="profitCalculator">
+            <label for="sellingPrice">販売価格（円）:</label>
+        <input type="number" id="sellingPrice" placeholder="0" required>
+        <br><br>
 
-<h1>仕入れ判断 計算サイト</h1>
+        <!-- 手数料率のフィールドを削除し、販売プラットフォームの選択のみ残す -->
+        <label for="platform">販売プラットフォーム:</label>
+        <select id="platform">
+            <option value="mercari">メルカリ</option>
+            <option value="rakuma">ラクマ</option>
+            <option value="yahoo">ヤフオク</option>
+            <option value="paypay">PayPayフリマ</option>
+            <option value="SNKRDUNK">スニダン</option>
+            <option value="BUYMA">バイマ</option>
+        </select>
+        <br><br>
 
-<div class="container">
-    <label for="platform">販売プラットフォーム選択:</label>
-    <select id="platform">
-        <option value="mercari">メルカリ</option>
-        <option value="rakuma">ラクマ</option>
-        <option value="paypay">PayPayフリマ</option>
-    </select>
 
-    <br><br>
+            <label for="shippingCost">メルカリ送料（円）:</label>
+            <select id="shippingCost" required>
+                <option value="160">📮¥160 ゆうパケットポストmini（要専用封筒）</option>
+                <option value="215">📮¥215 ゆうパケットポスト（要専用シール/要専用箱）</option>
+                <option value="455">🏣¥455 ゆうパケットプラス（要専用箱）</option>
+                <option value="210">🐈‍⬛¥210 ネコポス（ポスト受取サイズ）</option>
+                <option value="450">🐈‍⬛¥450 宅急便コンパクト</option>
+                <option value="None">手入力する</option>
+            </select>
 
-    <label>仕入れ値:</label>
-    <input type="number" id="purchasePrice" placeholder="0" required>
+            <input type="number" id="shippingCostHand" placeholder="0" style="display: none;" required>
 
-    <br><br>
+            <br><br>
 
-    <label>販売価格:</label>
-    <input type="number" id="sellingPrice" placeholder="0" required>
+            <label>仕入れ値:</label>
+            <div>
+                <input type="radio" id="costPriceJPY" name="costPriceCurrency" value="JPY" checked>
+                <label for="costPriceJPY">円</label>
+                <input type="radio" id="costPriceKRW" name="costPriceCurrency" value="KRW">
+                <label for="costPriceKRW">ウォン</label>
+            </div>
 
-    <br><br>
+            <input type="number" id="costPrice" placeholder="0" required>
 
-    <label>送料:</label>
-    <input type="number" id="shippingCost" placeholder="0" required>
+            <br><br>
 
-    <br><br>
+            <label>仕入れ時送料:</label>
+            <div>
+                <input type="radio" id="shippingCostJPY" name="shippingCostCurrency" value="JPY" checked>
+                <label for="shippingCostJPY">円</label>
+                <input type="radio" id="shippingCostKRW" name="shippingCostCurrency" value="KRW">
+                <label for="shippingCostKRW">ウォン</label>
+                 <input type="number" id="purchaseShippingCost" placeholder="0" required>
+                 <br><br>
+            </div>
+            <label>為替レート（1ウォンあたりの円換算）:</label>
+            <input type="number" id="exchangeRate" placeholder="0.1" required>
 
-    <button onclick="calculateProfit()">計算</button>
+            <br><br>
+            <label>関税率（%）:</label>
+            <div>
+                <input type="radio" id="customsDutyTrue" name="customsDuty" value="True" checked>
+                <label for="customsDutyTrue">あり</label>
+                <input type="radio" id="customsDutyFalse" name="customsDuty" value="False">
+                <label for="customsDutyFalse">なし</label>
+                <input type="number" id="customsRate" placeholder="15" required>
+            </div>
 
-    <h3>計算結果</h3>
-    <table>
-        <tr><td>利益 (円)</td><td id="displayProfit" class="highlight">-</td></tr>
-        <tr><td>利益率 (%)</td><td id="displayProfitRate">-</td></tr>
-    </table>
+          <div class="buttons">
+    <button type="button" onclick="calculateProfit()">計算する</button>
+    <button type="reset">リセット</button>
+</div>
 
-    <textarea id="resultText" readonly rows="5"></textarea>
-    <button onclick="copyToClipboard('resultText')">コピー</button>
+<!-- ここに計算結果が表示されます -->
+<textarea id="resultText" readonly rows="7"></textarea>
+<button onclick="copyToClipboard()">コピー</button>
 
-    <br><br>
-
-    <textarea id="copyText" readonly style="background-color: #fffaf0; border: 1px solid #ffc0cb; color: #db7093;">
+<textarea id="copyText" readonly style="background-color: #fffaf0; border: 1px solid #ffc0cb; color: #db7093;">
 🔻 仕入れ判断 🔻
 
 ①簡単な商品タイトル
@@ -119,41 +222,207 @@ th, td {
 ⑤-2販売ページURLを添付
 
 ⑥仕入れ先ページのURL
-    </textarea>
-    <button onclick="copyToClipboard('copyText')">コピー</button>
-</div>
+</textarea>
+<button onclick="copyToClipboard('copyText')">コピー</button>
 
-<script>
-function calculateProfit() {
-    let purchasePrice = parseFloat(document.getElementById('purchasePrice').value) || 0;
-    let sellingPrice = parseFloat(document.getElementById('sellingPrice').value) || 0;
+
+
+
+        </form>
+
+        <table>
+            <tr>
+            <th>項目</th><th>値</th>
+            <th>項目</th><th>値</th>
+            <th>項目</th><th>値</th>
+            </tr>
+            <tr><td>メルカリ販売価格</td><td id="displaySellingPrice">-</td>
+            <td>メルカリ手数料</td><td id="displayCommission">-</td>
+            <td>メルカリ送料</td><td id="displayShippingCost">-</td></tr>
+            <tr><td>仕入れ値 (円)</td><td id="displayCostPriceJPY">-</td>
+            <td>仕入れ値 (ウォン)</td><td id="displayCostPriceKRW">-</td>
+            <td>仕入れ時送料</td><td id="displayPurchaseShippingCost">-</td></tr>
+            <tr><td>関税</td><td id="displayCustomsDuty">-</td>
+            <td>利益 (円)</td><td id="displayProfit" class="highlight">-</td>
+            <td>利益率 (%)</td><td id="displayProfitRate">-</td></tr>
+        </table>
+
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const shippingCostSelect = document.getElementById('shippingCost');
+            const shippingCostHandInput = document.getElementById('shippingCostHand');
+
+            // 初期状態では非表示
+            shippingCostHandInput.style.display = 'none';
+
+            // 送料選択時の動作
+            shippingCostSelect.addEventListener('change', function () {
+                if (shippingCostSelect.value === "None") {
+                    shippingCostHandInput.style.display = 'block'; // 表示
+                    shippingCostHandInput.required = true; // 必須に設定
+                } else {
+                    shippingCostHandInput.style.display = 'none'; // 非表示
+                    shippingCostHandInput.required = false; // 必須を解除
+                    shippingCostHandInput.value = ""; // 入力値をリセット
+                }
+            });
+        });
+
+
+  async function calculateProfit() {
+    const exchangeRate = parseFloat(document.getElementById('exchangeRate').value) || 0;
+    const sellingPrice = parseFloat(document.getElementById('sellingPrice').value) || 0;
+    const selectedPlatform = document.getElementById('platform').value;
+    const commissionRate = (platformFees[selectedPlatform] || 0) / 100;
+    const commission = sellingPrice * commissionRate;
+
     let shippingCost = parseFloat(document.getElementById('shippingCost').value) || 0;
+    const shippingCostHand = parseFloat(document.getElementById('shippingCostHand').value) || 0;
 
-    let commissionRate = 0.1; // 例：販売手数料 10%
-    let commission = sellingPrice * commissionRate;
-    let profit = sellingPrice - commission - shippingCost - purchasePrice;
-    let profitRate = (profit / sellingPrice) * 100;
+    if (document.getElementById('shippingCost').value === "None") {
+        shippingCost = shippingCostHand;
+    }
 
-    document.getElementById('displayProfit').textContent = profit.toFixed(0) + "円";
-    document.getElementById('displayProfitRate').textContent = profitRate.toFixed(2) + "%";
+    const costPrice = parseFloat(document.getElementById('costPrice').value) || 0;
+    const purchaseShippingCost = parseFloat(document.getElementById('purchaseShippingCost').value) || 0;
+    const costPriceCurrency = document.querySelector('input[name="costPriceCurrency"]:checked').value;
+    const costPriceInJPY = costPriceCurrency === "JPY" ? costPrice : Math.round(costPrice * exchangeRate);
+    const purchaseShippingCostCurrency = document.querySelector('input[name="shippingCostCurrency"]:checked').value;
+    const purchaseShippingCostInJPY = purchaseShippingCostCurrency === "JPY" ? purchaseShippingCost : Math.round(purchaseShippingCost * exchangeRate);
 
-    document.getElementById('resultText').value =
+    const customsDutyRate = document.getElementById('customsDutyTrue').checked ? parseFloat(document.getElementById('customsRate').value) / 100 : 0;
+    const customsDutyPrice = isNaN(customsDutyRate) ? 0 : costPriceInJPY * customsDutyRate;
+
+    const profit = (sellingPrice - commission - shippingCost - costPriceInJPY - purchaseShippingCostInJPY - customsDutyPrice);
+    const profitRate = sellingPrice > 0 ? (profit / sellingPrice) * 100 : 0;
+
+    document.getElementById('displaySellingPrice').textContent = sellingPrice.toFixed(0);
+    document.getElementById('displayCommission').textContent = commission.toFixed(0);
+    document.getElementById('displayShippingCost').textContent = shippingCost.toFixed(0);
+    document.getElementById('displayCustomsDuty').textContent = isNaN(customsDutyPrice) ? "0" : customsDutyPrice.toFixed(0);
+    document.getElementById('displayCostPriceJPY').textContent = costPriceCurrency === "JPY" ? costPrice.toFixed(0) : (costPrice * exchangeRate).toFixed(0);
+    document.getElementById('displayCostPriceKRW').textContent = costPriceCurrency === "KRW" ? costPrice.toFixed(0) : (costPrice / exchangeRate).toFixed(0);
+    document.getElementById('displayPurchaseShippingCost').textContent = purchaseShippingCostInJPY.toFixed(0);
+    document.getElementById('displayProfit').textContent = profit.toFixed(0);
+    document.getElementById('displayProfitRate').textContent = profitRate.toFixed(2);
+
+    // 改行を保持して計算結果を表示
+    const resultText =
 `販売価格：${sellingPrice.toFixed(0)}円
 販売手数料：${commission.toFixed(0)}円
 送料：${shippingCost.toFixed(0)}円
-利益：${profit.toFixed(0)}円
-利益率：${profitRate.toFixed(2)}%`;
+仕入れ値：${costPriceInJPY.toFixed(0)}円
+仕入れ時送料：${purchaseShippingCostInJPY.toFixed(0)}円
+関税：${customsDutyPrice.toFixed(0)}円
+＝利益額：${profit.toFixed(0)}円`;
+
+    document.getElementById('resultText').value = resultText;
 }
 
-function copyToClipboard(elementId) {
-    let copyText = document.getElementById(elementId);
-    navigator.clipboard.writeText(copyText.value).then(() => {
-        alert("コピーしました！");
+// クリップボードにコピーする関数
+function copyToClipboard() {
+    const resultText = document.getElementById('resultText');
+
+    // まずは最新の `navigator.clipboard.writeText()` を試す
+    navigator.clipboard.writeText(resultText.value).then(() => {
+        alert("計算結果をコピーしました！");
     }).catch(err => {
-        alert("コピーに失敗しました: " + err);
+        console.warn("最新のコピーAPIに失敗: ", err);
+
+        // 代替手段として従来の `execCommand('copy')` を試す
+        try {
+            resultText.select();
+            resultText.setSelectionRange(0, 99999); // モバイル対応
+            document.execCommand("copy");
+            alert("コピーしました！（代替手段を使用）");
+        } catch (error) {
+            alert("コピーに失敗しました。手動でコピーしてください。");
+            console.error("代替コピー手段も失敗しました: ", error);
+        }
     });
 }
-</script>
 
+
+
+// プラットフォームごとの手数料率（%）
+const platformFees = {
+    mercari: 10,      // メルカリ: 10%
+    rakuma: 6,        // ラクマ: 6%
+    yahoo: 8.5,       // ヤフオク: 8.5%
+    paypay: 5,        // PayPayフリマ: 5%
+    SNKRDUNK: 5.5,    // スニダン: 5.5%
+    BUYMA: 7.9        // バイマ: 7.9%
+};
+
+// プラットフォームごとの送料リスト
+const platformShipping = {
+    mercari: [
+        { value: 160, text: "📮¥160 ゆうパケットポストmini（要専用封筒）" },
+        { value: 215, text: "📮¥215 ゆうパケットポスト（要専用シール/要専用箱）" },
+        { value: 455, text: "🏣¥455 ゆうパケットプラス（要専用箱）" },
+        { value: 210, text: "🐈‍⬛¥210 ネコポス（ポスト受取サイズ）" },
+        { value: 450, text: "🐈‍⬛¥450 宅急便コンパクト" },
+        { value: 450, text: "📦¥750 60サイズ" },
+        { value: "None", text: "手入力する" }
+    ],
+    rakuma: [
+        { value: 179, text: "📮¥179 かんたんラクマパック（ネコポス）" },
+        { value: 380, text: "🐈‍⬛¥380 かんたんラクマパック（宅急便コンパクト）" },
+        { value: "None", text: "手入力する" }
+    ],
+    yahoo: [
+        { value: 210, text: "📦¥210 ヤフネコ! ネコポス" },
+        { value: 380, text: "📦¥380 ヤフネコ! 宅急便コンパクト" },
+        { value: "None", text: "手入力する" }
+    ],
+    paypay: [
+        { value: 170, text: "📦¥170 ゆうパケット（ポスト投函）" },
+        { value: 380, text: "📦¥380 宅急便コンパクト" },
+        { value: "None", text: "手入力する" }
+    ],
+    SNKRDUNK: [
+        { value: 800, text: "📦¥800 通常配送" },
+        { value: "None", text: "手入力する" }
+    ],
+    BUYMA: [
+        { value: 1000, text: "📦¥1000 国際配送" },
+        { value: "None", text: "手入力する" }
+    ]
+};
+
+// プラットフォームが変更されたときの処理
+document.getElementById("platform").addEventListener("change", function () {
+    const selectedPlatform = this.value;
+    updateShippingOptions(selectedPlatform);
+});
+
+
+
+// 送料選択肢を更新する関数
+function updateShippingOptions(platform) {
+    const shippingSelect = document.getElementById("shippingCost");
+    shippingSelect.innerHTML = ""; // 一旦クリア
+
+    if (platformShipping[platform]) {
+        platformShipping[platform].forEach(option => {
+            const opt = document.createElement("option");
+            opt.value = option.value;
+            opt.textContent = option.text;
+            shippingSelect.appendChild(opt);
+        });
+    }
+}
+
+    function copyToClipboard(elementId) {
+        var copyText = document.getElementById(elementId);
+        copyText.select();
+        document.execCommand("copy");
+        alert("コピーしました！");
+    }
+
+
+    </script>
 </body>
 </html>
