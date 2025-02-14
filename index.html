@@ -2,6 +2,7 @@
 <html lang="ja">
 <head>
 
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>계산기</title>
@@ -43,6 +44,7 @@
                                 justify-content: center;
                             }
 
+
     　@media (max-width: 768px) {
     table {
         display: block;
@@ -57,39 +59,23 @@
 }
 
 
-       body {
-    font-family: Arial, sans-serif;
-    margin: 10px; /* 余白を減らしてコンパクトに */
-    background-color: #ffe4e1;
-    font-size: 14px; /* 文字を少し小さくする */
-}
-
-.container {
-    max-width: 500px; /* 横幅を狭めて画面に収まりやすくする */
-    margin: 0 auto;
-    padding: 10px; /* 余白を減らしてコンパクトに */
-    background-color: #fff0f5;
-    border-radius: 8px;
-    border: 1px solid #ffc0cb;
-}
-
-/* 入力フィールドのサイズを小さく */
-input[type="number"], select {
-    width: 100%;
-    padding: 6px; /* 余白を減らす */
-    font-size: 14px; /* フォントサイズを小さく */
-}
-
-/* 2列レイアウトを導入して横に並べる */
-.input-table {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* 2列レイアウト */
-    gap: 8px; /* 隙間を少し調整 */
-}
-
-.input-table div {
-    display: flex;
-    flex-direction: column;
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #ffe4e1;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff0f5;
+            border-radius: 8px;
+            border: 1px solid #ffc0cb;
+        }
+        h1 {
+    text-align: center;
+    color: #db7093;
+    font-size: 1.3em; /* ここを追加 */
 }
 
         table {
@@ -140,10 +126,10 @@ input[type="number"], select {
 </head>
 <body>
     <div class="container">
-        <h1>계산기</h1>
+        <h1></h1>
         <form id="profitCalculator">
             <label for="sellingPrice">販売価格（円）:</label>
-        <input type="number" id="exchangeRate" value="0.1" step="0.01" min="0" required>
+        <input type="number" id="sellingPrice" placeholder="0" required>
         <br><br>
 
         <!-- 手数料率のフィールドを削除し、販売プラットフォームの選択のみ残す -->
@@ -237,9 +223,6 @@ input[type="number"], select {
 ⑥仕入れ先ページのURL
 </textarea>
 <button onclick="copyToClipboard('copyText')">コピー</button>
-
-
-
 
         </form>
 
@@ -337,23 +320,13 @@ input[type="number"], select {
 // クリップボードにコピーする関数
 function copyToClipboard() {
     const resultText = document.getElementById('resultText');
+    resultText.select();
+    resultText.setSelectionRange(0, 99999); // モバイル対応
 
-    // まずは最新の `navigator.clipboard.writeText()` を試す
     navigator.clipboard.writeText(resultText.value).then(() => {
         alert("計算結果をコピーしました！");
     }).catch(err => {
-        console.warn("最新のコピーAPIに失敗: ", err);
-
-        // 代替手段として従来の `execCommand('copy')` を試す
-        try {
-            resultText.select();
-            resultText.setSelectionRange(0, 99999); // モバイル対応
-            document.execCommand("copy");
-            alert("コピーしました！（代替手段を使用）");
-        } catch (error) {
-            alert("コピーに失敗しました。手動でコピーしてください。");
-            console.error("代替コピー手段も失敗しました: ", error);
-        }
+        console.error("コピーに失敗しました", err);
     });
 }
 
@@ -377,7 +350,6 @@ const platformShipping = {
         { value: 455, text: "🏣¥455 ゆうパケットプラス（要専用箱）" },
         { value: 210, text: "🐈‍⬛¥210 ネコポス（ポスト受取サイズ）" },
         { value: 450, text: "🐈‍⬛¥450 宅急便コンパクト" },
-        { value: 450, text: "📦¥750 60サイズ" },
         { value: "None", text: "手入力する" }
     ],
     rakuma: [
