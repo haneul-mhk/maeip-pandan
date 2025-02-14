@@ -3,16 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>仕入れ判断</title>
+<title>仕入れ判断 計算サイト</title>
 
 <style>
 /* 販売プラットフォームの選択スタイル */
 select#platform {
-    /* 必要ならスタイルを追加 */
+    width: 100%;
+    padding: 8px;
+    margin-top: 10px;
 }
 
+/* スマホ用のレイアウト調整 */
 @media (max-width: 768px) {
-    /* スマホ用のレイアウト調整 */
     .container {
         flex-direction: column;
     }
@@ -33,6 +35,7 @@ select#platform {
 
 body {
     font-family: Arial, sans-serif;
+    text-align: center;
 }
 
 th, td {
@@ -41,7 +44,6 @@ th, td {
     background-color: #fffaf0;
     color: #db7093;
     font-size: 12px;
-    padding: 4px;
     line-height: 1.2;
 }
 
@@ -49,16 +51,57 @@ th, td {
     text-align: center;
     margin-top: 20px;
 }
+
+.container {
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+}
 </style>
 </head>
 <body>
 
 <h1>仕入れ判断 計算サイト</h1>
 
-<textarea id="resultText" readonly rows="7"></textarea>
-<button onclick="copyToClipboard('resultText')">コピー</button>
+<div class="container">
+    <label for="platform">販売プラットフォーム選択:</label>
+    <select id="platform">
+        <option value="mercari">メルカリ</option>
+        <option value="rakuma">ラクマ</option>
+        <option value="paypay">PayPayフリマ</option>
+    </select>
 
-<textarea id="copyText" readonly style="background-color: #fffaf0; border: 1px solid #ffc0cb; color: #db7093;">
+    <br><br>
+
+    <label>仕入れ値:</label>
+    <input type="number" id="purchasePrice" placeholder="0" required>
+
+    <br><br>
+
+    <label>販売価格:</label>
+    <input type="number" id="sellingPrice" placeholder="0" required>
+
+    <br><br>
+
+    <label>送料:</label>
+    <input type="number" id="shippingCost" placeholder="0" required>
+
+    <br><br>
+
+    <button onclick="calculateProfit()">計算</button>
+
+    <h3>計算結果</h3>
+    <table>
+        <tr><td>利益 (円)</td><td id="displayProfit" class="highlight">-</td></tr>
+        <tr><td>利益率 (%)</td><td id="displayProfitRate">-</td></tr>
+    </table>
+
+    <textarea id="resultText" readonly rows="5"></textarea>
+    <button onclick="copyToClipboard('resultText')">コピー</button>
+
+    <br><br>
+
+    <textarea id="copyText" readonly style="background-color: #fffaf0; border: 1px solid #ffc0cb; color: #db7093;">
 🔻 仕入れ判断 🔻
 
 ①簡単な商品タイトル
@@ -76,12 +119,34 @@ th, td {
 ⑤-2販売ページURLを添付
 
 ⑥仕入れ先ページのURL
-</textarea>
-<button onclick="copyToClipboard('copyText')">コピー</button>
+    </textarea>
+    <button onclick="copyToClipboard('copyText')">コピー</button>
+</div>
 
 <script>
+function calculateProfit() {
+    let purchasePrice = parseFloat(document.getElementById('purchasePrice').value) || 0;
+    let sellingPrice = parseFloat(document.getElementById('sellingPrice').value) || 0;
+    let shippingCost = parseFloat(document.getElementById('shippingCost').value) || 0;
+
+    let commissionRate = 0.1; // 例：販売手数料 10%
+    let commission = sellingPrice * commissionRate;
+    let profit = sellingPrice - commission - shippingCost - purchasePrice;
+    let profitRate = (profit / sellingPrice) * 100;
+
+    document.getElementById('displayProfit').textContent = profit.toFixed(0) + "円";
+    document.getElementById('displayProfitRate').textContent = profitRate.toFixed(2) + "%";
+
+    document.getElementById('resultText').value =
+`販売価格：${sellingPrice.toFixed(0)}円
+販売手数料：${commission.toFixed(0)}円
+送料：${shippingCost.toFixed(0)}円
+利益：${profit.toFixed(0)}円
+利益率：${profitRate.toFixed(2)}%`;
+}
+
 function copyToClipboard(elementId) {
-    var copyText = document.getElementById(elementId);
+    let copyText = document.getElementById(elementId);
     navigator.clipboard.writeText(copyText.value).then(() => {
         alert("コピーしました！");
     }).catch(err => {
@@ -89,5 +154,6 @@ function copyToClipboard(elementId) {
     });
 }
 </script>
+
 </body>
 </html>
