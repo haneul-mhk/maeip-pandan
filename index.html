@@ -152,7 +152,7 @@
                 <option value="455">🏣¥455 ゆうパケットプラス（要専用箱）</option>
                 <option value="210">🐈‍⬛¥210 ネコポス（ポスト受取サイズ）</option>
                 <option value="450">🐈‍⬛¥450 宅急便コンパクト</option>
-                <option value="750">📦¥750 60サイズ</option>
+                <option value="750">📦¥750（60サイズ）</option>
                 <option value="None">手入力する</option>
             </select>
 
@@ -182,7 +182,8 @@
                  <br><br>
             </div>
             <label>為替レート（1ウォンあたりの円換算）:</label>
-            <input type="number" id="exchangeRate" placeholder="0.1" required>
+            <input type="number" id="exchangeRate" placeholder="0.1" step="any" required>
+            <button type="button" id="updateRateButton">最新レートに更新</button>
 
             <br><br>
             <label>関税率（%）:</label>
@@ -317,19 +318,38 @@
     document.getElementById('resultText').value = resultText;
 }
 
-// クリップボードにコピーする関数
-function copyToClipboard() {
-    const resultText = document.getElementById('resultText');
-    resultText.select();
-    resultText.setSelectionRange(0, 99999); // モバイル対応
+        // クリップボードにコピーする関数
+        function copyToClipboard(elementId = "resultText") {
+            const copyText = document.getElementById(elementId);
 
-    navigator.clipboard.writeText(resultText.value).then(() => {
-        alert("計算結果をコピーしました！");
-    }).catch(err => {
-        console.error("コピーに失敗しました", err);
-    });
-}
+            // `readonly` を一時的に解除
+            const isReadonly = copyText.hasAttribute("readonly");
+            if (isReadonly) {
+                copyText.removeAttribute("readonly");
+            }
 
+            // コピー処理
+            copyText.select();
+            copyText.setSelectionRange(0, 99999); // モバイル対応
+
+            try {
+                navigator.clipboard.writeText(copyText.value).then(() => {
+                    alert("コピーしました！");
+                }).catch(err => {
+                    console.error("navigator.clipboard が使えません", err);
+                    document.execCommand("copy");
+                    alert("コピーしました！（フォールバック動作）");
+                });
+            } catch (err) {
+                console.error("コピーに失敗しました", err);
+                alert("コピーに失敗しました");
+            }
+
+            // コピー後に `readonly` を戻す
+            if (isReadonly) {
+                copyText.setAttribute("readonly", "true");
+            }
+        }
 
 
 // プラットフォームごとの手数料率（%）
@@ -400,13 +420,40 @@ function updateShippingOptions(platform) {
     }
 }
 
-    function copyToClipboard(elementId) {
-        var copyText = document.getElementById(elementId);
-        copyText.select();
-        document.execCommand("copy");
-        alert("コピーしました！");
-    }
+          async function fetchExchangeRate() {
+              try {
+                  const response = await fetch('https://api.exchangerate-api.com/v4/latest/KRW'); // APIから最新レート取得
+                  const data = await response.json();
+                  const exchangeRate = data.rates.JPY; // 韓国ウォン → 日本円 の為替レート
+                  document.getElementById("exchangeRate").value = exchangeRate.toFixed(4); // 小数4桁で表示
+              } catch (error) {
+                  console.error("為替レートの取得に失敗しました", error);
+                  alert("為替レートの取得に失敗しました。手動で入力してください。");
+              }
+          }
 
+          // ページ読み込み時に最新のレートを取得
+          document.addEventListener("DOMContentLoaded", fetchExchangeRate);
+
+          // 更新ボタンで手動更新
+          document.getElementById("updateRateButton").addEventListener("click", fetchExchangeRate);
+
+          document.getElementById("exchangeRate").addEventListener("input", function() {
+              this.value = this.value.replace(/[^0-9.]/g, ''); // 数字とピリオド以外を削除
+          });document.querySelectorAll('input[name="customsDuty"]').forEach((radio) => {
+    radio.addEventListener("change", function() {
+        const customsRateInput = document.getElementById("customsRate");
+
+        if (document.getElementById("customsDutyFalse").checked) {
+            customsRateInput.value = ""; // なしを選んだら値をクリア
+            customsRateInput.removeAttribute("required"); // 必須を解除
+            customsRateInput.disabled = true; // 入力を無効化
+        } else {
+            customsRateInput.setAttribute("required", "true"); // 必須を設定
+            customsRateInput.disabled = false; // 入力を有効化
+        }
+    });
+});
 
     </script>
 </body>
