@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>계산기</title>
+    
     <style>
-       /* 販売プラットフォームの選択スタイル */
+    /* 販売プラットフォームの選択スタイル */
     select#platform {
     width: 100%;
     padding: 8px;
@@ -16,67 +15,60 @@
     border-radius: 4px;
     background-color: #fffaf0;
     color: #db7093;
-}
+　　}
 
-                     /* 計算結果の表示エリア */
-                     #resultText {
-                    margin-top: 10px;  /* ボタンとの間隔 */
-                    padding: 10px;
-                    background-color: #fffaf0;
-                    border: 1px solid #ffc0cb;
-                    border-radius: 4px;
-                    color: #db7093;
-                    font-family: monospace;
-                    white-space: pre-wrap;
-                    text-align: left;
-                }
+     /* 計算結果の表示エリア */
+     #resultText {
+     margin-top: 10px;  /* ボタンとの間隔 */
+     padding: 10px;
+     background-color: #fffaf0;
+     border: 1px solid #ffc0cb;
+     border-radius: 4px;
+     color: #db7093;
+     font-family: monospace;
+     white-space: pre-wrap;
+     text-align: left;
+     }
 
-            .input-table {
-                              width: 100%;
-                              display: grid;
-                              grid-template-columns: 1fr 1fr; /* 2列 */
-                              gap: 10px;
-                          }
+      .input-table {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr; /* 2列 */
+      gap: 10px;
+      }
 
-                          .input-table div {
-                                display: flex;
-                                flex-direction: column;
-                                justify-content: center;
-                            }
+      .input-table div {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      }
 
 
     　@media (max-width: 768px) {
-    table {
-        display: block;
-        width: 100%;
-        overflow-x: auto;
-        white-space: nowrap;
-    }
-    th, td {
-        display: inline-block;
-        width: 45%; /* 2列のレイアウトを維持 */
-    }
-}
-
-
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #ffe4e1;
+      table {
+      display: block;
+      width: 100%;
+      overflow-x: auto;
+      white-space: nowrap;
+      }
+      th, td {
+      display: inline-block;
+      width: 45%; /* 2列のレイアウトを維持 */
+      }
+      }
+       body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background-color: #ffe4e1;
         }
         .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #fff0f5;
-            border-radius: 8px;
-            border: 1px solid #ffc0cb;
-        }
-        h1 {
-    text-align: center;
-    color: #db7093;
-    font-size: 1.3em; /* ここを追加 */
-}
+          max-width: 600px;
+          margin: 0 auto;
+          padding: 20px;
+          background-color: #fff0f5;
+          border-radius: 8px;
+          border: 1px solid #ffc0cb;
+          }
 
         table {
             width: 100%;
@@ -87,10 +79,10 @@
             border: 1px solid #ffc0cb;
         }
         th, td {
-    font-size: 12px; /* 文字を小さくする */
-    padding: 4px; /* 余白も少し調整 */
-    line-height: 1.2;
-}
+      font-size: 12px; /* 文字を小さくする */
+      padding: 4px; /* 余白も少し調整 */
+      line-height: 1.2;
+       }
 
         .buttons {
             text-align: center;
@@ -108,22 +100,40 @@
         .buttons button:hover {
             background-color: #ff69b4;
         }
-        input[type="number"], select {
-            width: 100%;
-            padding: 8px;
-            margin-top: 10px;
-            border: 1px solid #ffc0cb;
-            border-radius: 4px;
-            background-color: #fffaf0;
-            color: #db7093;
-        }
+        
         .highlight {
             font-weight: bold;
             color: #b22222;
         }
 
+        /* 見出しを小さく調整 */
+        h1 {
+        text-align: center;
+        color: #db7093;
+        font-size: 1.2em; /* 小さめの見出し */
+        }
+
+        /* フォーム内のラベルの文字サイズを小さく */
+        label {
+            font-size: 12px;
+            color: #db7093;
+        }
+
+        /* 入力欄とセレクトボックスのスタイル */
+        input[type="number"], select {
+        width: 100%;
+        padding: 4px;      /* 高さを低めに */
+        font-size: 12px;   /* 文字を小さくして見やすく */
+        margin-top: 5px;   /* 上の余白を少なめに */
+        border: 1px solid #ffc0cb;
+        border-radius: 4px;
+        background-color: #fffaf0;
+        color: #db7093;
+        }   
+
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1></h1>
@@ -143,7 +153,6 @@
             <option value="BUYMA">バイマ</option>
         </select>
         <br><br>
-
 
             <label for="shippingCost">メルカリ送料（円）:</label>
             <select id="shippingCost" required>
@@ -266,8 +275,7 @@
             });
         });
 
-
-  async function calculateProfit() {
+    async function calculateProfit() {
     const exchangeRate = parseFloat(document.getElementById('exchangeRate').value) || 0;
     const sellingPrice = parseFloat(document.getElementById('sellingPrice').value) || 0;
     const selectedPlatform = document.getElementById('platform').value;
